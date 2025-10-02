@@ -58,7 +58,7 @@ pipeline {
                     sudo ${VENV_PATH}/bin/pip install -r ${DEPLOY_PATH}/requirements.txt
                     
                     # Copy supervisor config
-                    sudo cp ${DEPLOY_PATH}/python-image.conf /etc/supervisord.d/
+                    sudo cp ${DEPLOY_PATH}/python-image.ini /etc/supervisord.d/
                     
                     # Reload and restart supervisor service
                     sudo supervisorctl reread
