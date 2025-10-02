@@ -49,10 +49,11 @@ pipeline {
                     sudo mkdir -p ${DEPLOY_PATH}
                     sudo mkdir -p /var/log/supervisor
                     
-                    # Copy application files
-                    sudo cp -r ${WORKSPACE}/* ${DEPLOY_PATH}/
+                    # Copy application files (exclude venv directory)
+                    sudo rsync -av --exclude='venv' --exclude='.git' --exclude='__pycache__' ${WORKSPACE}/ ${DEPLOY_PATH}/
                     
-                    # Create/update virtual environment
+                    # Remove old virtual environment and create new one
+                    sudo rm -rf ${VENV_PATH}
                     sudo ${PYTHON_BIN} -m venv ${VENV_PATH}
                     sudo ${VENV_PATH}/bin/pip install --upgrade pip
                     sudo ${VENV_PATH}/bin/pip install -r ${DEPLOY_PATH}/requirements.txt
