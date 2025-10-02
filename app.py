@@ -168,12 +168,12 @@ def generate_image():
         
         # Save image to bytes buffer
         img_buffer = io.BytesIO()
-        image.save(img_buffer, format='PNG')
+        image.save(img_buffer, format='JPEG')
         img_buffer.seek(0)
         
         # Option 1: Return as file
         if request.args.get('return_file', 'true').lower() == 'true':
-            return send_file(img_buffer, mimetype='image/png')
+            return send_file(img_buffer, mimetype='image/jpeg')
         
         # Option 2: Return as base64 (default)
         img_base64 = base64.b64encode(img_buffer.getvalue()).decode('utf-8')
@@ -182,7 +182,7 @@ def generate_image():
             "success": True,
             "prompt": prompt,
             "dimensions": {"width": width, "height": height},
-            "image": f"data:image/png;base64,{img_base64}"
+            "image": f"data:image/jpeg;base64,{img_base64}"
         })
         
     except Exception as e:
