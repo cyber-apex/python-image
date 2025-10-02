@@ -4,12 +4,10 @@ After=network.target
 
 [Service]
 Type=simple
-User=www-data
-Group=www-data
 WorkingDirectory=/opt/python-image
 Environment="PATH=/opt/python-image/venv/bin"
 Environment="PORT=5566"
-ExecStart=/opt/python-image/venv/bin/python app.py
+ExecStart=/opt/python-image/venv/bin/gunicorn -w 4 -b 0.0.0.0:5566 app:app
 Restart=always
 RestartSec=10
 

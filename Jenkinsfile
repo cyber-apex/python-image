@@ -4,8 +4,8 @@ pipeline {
     environment {
         PROJECT_NAME = 'python-image'
         DEPLOY_PATH = '/opt/python-image'
-        PYTHON_BIN = '/usr/local/bin/python3'
-        PIP_BIN = '/usr/local/bin/pip3'
+        PYTHON_BIN = '/usr/local/bin/python3.9'
+        VENV_PATH = "${DEPLOY_PATH}/venv"
     }
     
     stages {
@@ -22,6 +22,8 @@ pipeline {
                 sh '''
                     ${PYTHON_BIN} -m venv ${WORKSPACE}/venv
                     . ${WORKSPACE}/venv/bin/activate
+                    python --version
+                    pip --version
                     pip install --upgrade pip
                     pip install -r requirements.txt
                 '''
@@ -45,17 +47,22 @@ pipeline {
                 sh '''
                     # Create deploy directory if not exists
                     sudo mkdir -p ${DEPLOY_PATH}
+                    sudo mkdir -p /var/log/supervisor
                     
                     # Copy application files
                     sudo cp -r ${WORKSPACE}/* ${DEPLOY_PATH}/
                     
+                    # Create/update virtual environment
+                    sudo ${PYTHON_BIN} -m venv ${VENV_PATH}
+                    sudo ${VENV_PATH}/bin/pip install --upgrade pip
+                    sudo ${VENV_PATH}/bin/pip install -r ${DEPLOY_PATH}/requirements.txt
                     
-                    # Install/update dependencies in deploy location
-                    sudo -u  ${PYTHON_BIN} -m venv ${VENV_PATH}
-                    sudo -u  ${VENV_PATH}/bin/pip install --upgrade pip
-                    sudo -u  ${VENV_PATH}/bin/pip install -r ${DEPLOY_PATH}/requirements.txt
+                    # Copy supervisor config
+                    sudo cp ${DEPLOY_PATH}/python-image.conf /etc/supervisor/conf.d/
                     
-                    # Restart service (supervisor)
+                    # Reload and restart supervisor service
+                    sudo supervisorctl reread
+                    sudo supervisorctl update
                     sudo supervisorctl restart python-image-gunicorn
                 '''
             }
