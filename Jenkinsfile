@@ -4,8 +4,8 @@ pipeline {
     environment {
         PROJECT_NAME = 'python-image'
         DEPLOY_PATH = '/opt/python-image'
-        VENV_PATH = "${DEPLOY_PATH}/venv"
-        PYTHON_BIN = '/usr/bin/python3'
+        PYTHON_BIN = '/usr/local/bin/python3'
+        PIP_BIN = '/usr/local/bin/pip3'
     }
     
     stages {
@@ -49,10 +49,11 @@ pipeline {
                     # Copy application files
                     sudo cp -r ${WORKSPACE}/* ${DEPLOY_PATH}/
                     
+                    
                     # Install/update dependencies in deploy location
-                    sudo ${PYTHON_BIN} -m venv ${VENV_PATH}
-                    sudo ${VENV_PATH}/bin/pip install --upgrade pip
-                    sudo ${VENV_PATH}/bin/pip install -r ${DEPLOY_PATH}/requirements.txt
+                    sudo -u  ${PYTHON_BIN} -m venv ${VENV_PATH}
+                    sudo -u  ${VENV_PATH}/bin/pip install --upgrade pip
+                    sudo -u  ${VENV_PATH}/bin/pip install -r ${DEPLOY_PATH}/requirements.txt
                     
                     # Restart service (supervisor)
                     sudo supervisorctl restart python-image-gunicorn
