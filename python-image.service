@@ -1,0 +1,26 @@
+[Unit]
+Description=Python Image Generator Flask Application
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/python-image
+Environment="PATH=/opt/python-image/venv/bin"
+Environment="PORT=5566"
+ExecStart=/opt/python-image/venv/bin/python app.py
+Restart=always
+RestartSec=10
+
+# Logging
+StandardOutput=append:/var/log/python-image/access.log
+StandardError=append:/var/log/python-image/error.log
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+
